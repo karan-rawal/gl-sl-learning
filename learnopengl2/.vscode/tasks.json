@@ -1,0 +1,81 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "g++",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "osx": {
+                "args": [
+                    "-fdiagnostics-color=always",
+                    "-std=c++17",
+                    "-Wall",
+                    "-g",
+                    "-I${workspaceFolder}/Libraries/osx/includes",
+                    "-L${workspaceFolder}/Libraries/osx/lib",
+                    "${workspaceFolder}/src/*.cpp",
+                    "${workspaceFolder}/src/*.c",
+                    "${workspaceFolder}/Libraries/osx/lib/libglfw.3.dylib",
+                    "-o",
+                    "${workspaceFolder}/app",
+                    "-framework",
+                    "OpenGL",
+                    "-framework",
+                    "Cocoa",
+                    "-framework",
+                    "IOKit",
+                    "-framework",
+                    "CoreVideo",
+                    "-framework",
+                    "CoreFoundation",
+                    "-Wno-deprecated"
+                ]
+            },
+            "windows": {
+                "args": [
+                    "-fdiagnostics-color=always",
+                    "-std=c++17",
+                    "-Wall",
+                    "-g",
+                    "-I${workspaceFolder}/Libraries/includes",
+                    "-L${workspaceFolder}/Libraries/lib",
+                    "${workspaceFolder}/src/*.cpp",
+                    "${workspaceFolder}/Libraries/lib/libglfw.3.dylib",
+                    "-o",
+                    "${workspaceFolder}/app"
+                ]
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "rm",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "args": [
+                "-rf",
+                "${workspaceFolder}/app.dSYM",
+                "${workspaceFolder}/app"
+            ],
+        }
+    ]
+}

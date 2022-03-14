@@ -2,6 +2,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+void processInput(GLFWwindow* window) {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, true);
+	}
+}
+
 int main() {
 	glfwInit();
 
@@ -16,8 +22,9 @@ int main() {
 	glfwMakeContextCurrent(window);
 
 
-	while (true) {
-
+	while (!glfwWindowShouldClose(window)) {
+		processInput(window);
+		glfwPollEvents();
 	}
 
 	glfwDestroyWindow(window);

@@ -4,10 +4,17 @@
 
 using namespace std;
 
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 800;
+
 void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
+}
+
+void onFramebufferSize(GLFWwindow *window, int width, int height) {
+	glViewport(0, 0, width, height);
 }
 
 int main() {
@@ -22,7 +29,7 @@ int main() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Create a glfw window and do the error handling.
-	GLFWwindow* window = glfwCreateWindow(800, 800, "learnopengl.com", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "learnopengl.com", NULL, NULL);
 	if (window == NULL) {
 		cout << "Failed to create window." << endl;
 		glfwTerminate();
@@ -41,19 +48,24 @@ int main() {
 		return -1;
 	}
 
-	// open gl operations.
-	glViewport(0, 0, 800, 800);
-	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	
-	// tell glfw to swap front buffer with back buffer.
-	glfwSwapBuffers(window);
+	glfwSetFramebufferSizeCallback(window, onFramebufferSize);
 
-	// the main window loop.
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	// The main window loop.
 	while (!glfwWindowShouldClose(window)) {
-		processInput(window);
-		// process all pending events. Without this no events will be triggered.
+
+		// OpenGL operations.
+		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		
+		// Tell glfw to swap front buffer with back buffer.
+		glfwSwapBuffers(window);
+
+		// Process all pending events. Without this no events will be triggered.
 		glfwPollEvents();
+		// Handle the event.
+		processInput(window);
 	}
 
 	// finally, destroy the window and terminate glfw.

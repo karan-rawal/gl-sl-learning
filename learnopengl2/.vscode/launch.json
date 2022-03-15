@@ -15,7 +15,9 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "lldb"
+            "MIMode": "lldb",
+            "preLaunchTask": "Build",
+            "postDebugTask": "Clean osx"
         },
         {
             "name": "Launch windows",
@@ -27,7 +29,9 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb"
+            "MIMode": "gdb",
+            "preLaunchTask": "Build",
+            "postDebugTask": "Clean windows"
         },
     ],
 }

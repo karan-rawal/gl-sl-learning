@@ -63,7 +63,7 @@
             }
         },
         {
-            "label": "Clean",
+            "label": "Clean osx",
             "type": "shell",
             "command": "rm",
             "presentation": {
@@ -81,9 +81,21 @@
             ],
         },
         {
-            "command": "./app.exe",
-            "label": "Launch windows task",
+            "label": "Clean windows",
             "type": "shell",
-        }
+            "command": "rm",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "args": [
+                "-rf",
+                "./app.exe"
+            ],
+        },
     ]
 }

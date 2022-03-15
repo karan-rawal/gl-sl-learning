@@ -45,12 +45,15 @@
                     "-std=c++17",
                     "-Wall",
                     "-g",
-                    "-I${workspaceFolder}/Libraries/includes",
-                    "-L${workspaceFolder}/Libraries/lib",
-                    "${workspaceFolder}/src/*.cpp",
-                    "${workspaceFolder}/Libraries/lib/libglfw.3.dylib",
+                    "-I./Libraries/windows/includes",
+                    "-L./Libraries/windows/lib",
+                    "./src/*.cpp",
+                    "./src/*.c",
+                    "-lglfw3",
+                    "-lgdi32",
+                    "-lopengl32",
                     "-o",
-                    "${workspaceFolder}/app"
+                    "./app",
                 ]
             },
             "problemMatcher": [],
@@ -76,6 +79,11 @@
                 "${workspaceFolder}/app.dSYM",
                 "${workspaceFolder}/app"
             ],
+        },
+        {
+            "command": "./app.exe",
+            "label": "Launch windows task",
+            "type": "shell",
         }
     ]
 }

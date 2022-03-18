@@ -13,6 +13,10 @@ void processInput(GLFWwindow* window) {
     }
 }
 
+void onFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+}
+
 int main() {
     if (!glfwInit()) {
         cout << "Failed to init glfw.";
@@ -38,6 +42,7 @@ int main() {
         glfwTerminate();
         return -1;
     }
+    glfwSetFramebufferSizeCallback(window, onFramebufferSizeCallback);
 
     glViewport(0, 0, WIDTH, HEIGHT);
 

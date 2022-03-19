@@ -8,9 +8,10 @@ const int WIDTH = 800;
 const int HEIGHT = 800;
 
 float vertices[] = {
-    -0.5, -0.5f, 0.0f,
-    0.0f, 0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f,
+    // position         color
+    -0.5, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
+    0.0f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
+    0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,
 };
 
 void processInputs(GLFWwindow *window) {
@@ -23,7 +24,7 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-unsigned int createShader(char *shaderFile, unsigned int type) {
+unsigned int createShader(char const *shaderFile, unsigned int type) {
     unsigned int shader = glCreateShader(type);
     std::fstream shaderFileStream(shaderFile);
     std::stringstream buffer;
@@ -47,7 +48,7 @@ unsigned int createShader(char *shaderFile, unsigned int type) {
     return shader;
 }
 
-unsigned int createShaderProgram(char *vertexShaderFile, char *fragmentShaderFile) {
+unsigned int createShaderProgram(char const *vertexShaderFile, char const *fragmentShaderFile) {
     unsigned int shaderProgram = glCreateProgram();
     unsigned int vertexShader = createShader(vertexShaderFile, GL_VERTEX_SHADER);
     unsigned int fragmentShader = createShader(fragmentShaderFile, GL_FRAGMENT_SHADER);
@@ -86,7 +87,10 @@ int main() {
     }
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
-    unsigned int shaderProgram = createShaderProgram("./src/vertex_shader.glsl", "./src/fragment_shader.glsl");
+    char const *vertexShaderPath = "./src/vertex_shader.glsl";
+    char const *fragmentShaderPath = "./src/fragment_shader.glsl";
+    unsigned int shaderProgram = createShaderProgram(vertexShaderPath, fragmentShaderPath);
+    
     unsigned int vao, vbo;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -95,8 +99,10 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (0 * sizeof(float)));
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     while(!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -110,9 +116,11 @@ int main() {
         glfwSwapBuffers(window);
     }
 
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    glDisableVertexAttribArray(0);
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
     glDeleteProgram(shaderProgram);

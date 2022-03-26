@@ -1,136 +1,93 @@
-#include "includes.h"
-#include "shader/shader.h"
-#include "window/window.h"
-#include "utils/disposable.h"
+#include <iostream>
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-#define __APPLE true
+#include "includes.h"
+#include "shader.h"
+#include "vao.h"
+#include "texture.h"
 
 const int WIDTH = 800;
 const int HEIGHT = 800;
+std::string TITLE = "learn opengl 2";
 
-    float vertices[] = {
-        // positions          // colors           // texture coords
-         -0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-         -0.5f, 0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-          0.5f, 0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-          0.5f,  -0.5f, 0.0f, 1.0f, 1.0f, 1.0f,   0.0f, 1.0f  // top left 
-    };
-    unsigned int indices[] = {  
-        0, 1, 2, // first triangle
-        0, 2, 3  // second triangle
-    };
+float vertices[] = {
+    // position         // color          // texCoord
+    -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+     0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+    -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
+};
 
-void processInputs(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
+unsigned int indices[] = {
+    0, 1, 2,
+    0, 2, 3
+};
+
+void processInputs(GLFWwindow *window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
 }
 
-void framebufferSizeCallback(GLFWwindow *window, int width, int height)
-{
+void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-unsigned int createVAO()
-{
-    unsigned int vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    return vao;
-}
-
-unsigned int createVBO()
-{
-    unsigned int vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    return vbo;
-}
-
-unsigned int createEBO()
-{
-    unsigned int ebo;
-    glGenBuffers(1, &ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    return ebo;
-}
-
-Shader shader;
-unsigned int vao;
-unsigned int vbo;
-unsigned int ebo;
-unsigned int texture;
-
-
-void onUpdate(Window *window)
-{
-    processInputs(window->window);
-
-    glClearColor(0.2f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    shader.uniform1f("colorMultiplier", sin(glfwGetTime() * 0.2f) / 2.f + 0.5f);
-    glBindVertexArray(vao);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    shader.use();
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-    glfwSwapBuffers(window->window);
-    glfwPollEvents();
-}
-
-int main()
-{
-    Window window(WIDTH, HEIGHT, "learnopengl2");
-
-    shader = Shader("./src/vertex_shader.glsl", "./src/fragment_shader.glsl");
-
-    vao = createVAO();
-    vbo = createVBO();
-    ebo = createEBO();
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(0 * sizeof(float)));
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    int width, height, channels;
-    unsigned char *data = stbi_load("assets/container.jpeg", &width, &height, &channels, 0);
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-        std::cout << "Failed to load image file." << std::endl;
-        shader.dispose();
-        window.dispose();
+int main() {
+    if (!glfwInit()) {
+        std::cout << "Failed to initialize glfw." << std::endl;
+        return EXIT_FAILURE;
     }
-    stbi_image_free(data);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    if (__APPLE__) {
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    }
 
-    window.show(onUpdate);
+    GLFWwindow *window;
+    window = glfwCreateWindow(WIDTH, HEIGHT, TITLE.c_str(), NULL, NULL);
+    if (!window) {
+        std::cout << "Failed to create window." << std::endl;
+        glfwTerminate();
+        return EXIT_FAILURE;
+    }
+    glfwMakeContextCurrent(window);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-    glDeleteBuffers(1, &vbo);
-    glDeleteVertexArrays(1, &vao);
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+        std::cout << "Failed to load glad." << std::endl;
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        return EXIT_FAILURE;
+    }
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
-    shader.dispose();
-    window.dispose();
-    return 0;
+    Shader shader("./src/shaders/vertex.glsl", "./src/shaders/fragment.glsl");
+
+    VAO vao;
+    vao.setVertices(vertices, sizeof(vertices));
+    vao.setIndices(indices, sizeof(indices));
+    vao.enablePointer(0, 3, 8, 0);
+    vao.enablePointer(1, 3, 8, 3);
+    vao.enablePointer(2, 2, 8, 6);
+    
+    Texture containerTexture("./assets/container.jpeg", GL_RGB);
+    Texture awesomefaceTexture("./assets/awesomeface.png", GL_RGBA);
+
+    while(!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+        processInputs(window);
+
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        containerTexture.use(shader, "uTexture1", GL_TEXTURE0, 0);
+        awesomefaceTexture.use(shader, "uTexture2", GL_TEXTURE1, 1);
+        vao.draw(shader);
+
+        glfwSwapBuffers(window);
+    }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    return EXIT_SUCCESS;
 }

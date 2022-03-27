@@ -87,6 +87,14 @@ int main() {
         model = glm::rotate(model, glm::radians((float)glfwGetTime() * 50), glm::vec3(0.0f, 0.0f, 1.0f));
         shader.setUniformMatrix4fv("uMVP", model);
 
+        containerTexture.use(shader, "uTexture1", GL_TEXTURE0, 0);
+        awesomefaceTexture.use(shader, "uTexture2", GL_TEXTURE1, 1);
+        vao.draw(shader);
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-0.5f, 0.5f, 0.0f));
+        model = glm::scale(model, glm::vec3(sin(glfwGetTime() * 10) / 2 + 0.5f, 1.0f, 0.0f));
+        shader.setUniformMatrix4fv("uMVP", model);
 
         containerTexture.use(shader, "uTexture1", GL_TEXTURE0, 0);
         awesomefaceTexture.use(shader, "uTexture2", GL_TEXTURE1, 1);

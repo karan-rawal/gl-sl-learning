@@ -15,6 +15,7 @@ public:
     Shader(std::string vertexShaderPath, std::string fragmentShaderPath);
     void use();
     void setUniform1i(std::string name, int value);
+    void setUniformMatrix4fv(std::string name, glm::mat4 value);
     ~Shader();
 };
 #endif

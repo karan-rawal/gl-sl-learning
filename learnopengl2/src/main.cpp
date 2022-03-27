@@ -4,17 +4,19 @@
 #include "shader.h"
 #include "vao.h"
 #include "texture.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-const int WIDTH = 800;
-const int HEIGHT = 800;
+const int WIDTH = 400;
+const int HEIGHT = 400;
 std::string TITLE = "learn opengl 2";
 
 float vertices[] = {
-    // position         // color          // texCoord
-    -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-     0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-    -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
+    // position                                    // color            // texCoord
+    -0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+     0.5f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 1.0f,   0.0f, 1.0f
 };
 
 unsigned int indices[] = {
@@ -40,9 +42,9 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    if (__APPLE__) {
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    }
+    // if (__APPLE__) {
+    //     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    // }
 
     GLFWwindow *window;
     window = glfwCreateWindow(WIDTH, HEIGHT, TITLE.c_str(), NULL, NULL);
@@ -70,6 +72,7 @@ int main() {
     vao.enablePointer(1, 3, 8, 3);
     vao.enablePointer(2, 2, 8, 6);
     
+    
     Texture containerTexture("./assets/container.jpeg", GL_RGB);
     Texture awesomefaceTexture("./assets/awesomeface.png", GL_RGBA);
 
@@ -79,6 +82,11 @@ int main() {
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, -0.5f, 0));
+        model = glm::rotate(model, glm::radians((float)glfwGetTime() * 50), glm::vec3(0.0f, 0.0f, 1.0f));
+        shader.setUniformMatrix4fv("uMVP", model);
+
 
         containerTexture.use(shader, "uTexture1", GL_TEXTURE0, 0);
         awesomefaceTexture.use(shader, "uTexture2", GL_TEXTURE1, 1);

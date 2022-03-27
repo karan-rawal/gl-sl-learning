@@ -49,7 +49,6 @@
                     "-I./Libraries/windows/includes",
                     "-I./src",
                     "-L./Libraries/windows/lib",
-                    "./src/**/*.cpp",
                     "./src/*.cpp",
                     "./src/*.c",
                     "-lglfw3",

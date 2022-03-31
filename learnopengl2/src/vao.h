@@ -19,6 +19,7 @@ public:
     void enablePointer(unsigned int index, unsigned int size, unsigned int stride, unsigned int offset);
     void disablePointer(unsigned int index);
     void draw(Shader shader);
+    void drawArrays(Shader shader);
     ~VAO();
 };
 #endif

@@ -52,6 +52,13 @@ void VAO::draw(Shader shader) {
     unbind();
 }
 
+void VAO::drawArrays(Shader shader) {
+    shader.use();
+    bind();
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    unbind();
+}
+
 VAO::~VAO()
 {
     glBindBuffer(GL_ARRAY_BUFFER, 0);

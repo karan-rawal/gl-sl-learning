@@ -7,16 +7,56 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-const int WIDTH = 400;
-const int HEIGHT = 400;
+const int WIDTH = 800;
+const int HEIGHT = 800;
 std::string TITLE = "learn opengl 2";
 
+float deltaTime = 0.0f;	// Time between current frame and last frame
+float lastFrame = 0.0f; // Time of last frame
+
+
 float vertices[] = {
-    // position                                    // color            // texCoord
-    -0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,
-     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-     0.5f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 1.0f,   0.0f, 1.0f
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
 unsigned int indices[] = {
@@ -24,9 +64,51 @@ unsigned int indices[] = {
     0, 2, 3
 };
 
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, -20.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 cameraFaceDirection;
+
+
+float yaw = 0.0f;
+float pitch = 0.0f;
+
+float lastMouseX = 0.0f;
+float lastMouseY = 0.0f;
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+    float deltaMouseX = xpos - lastMouseX;
+    float deltaMouseY = ypos - lastMouseY;
+
+    float mouseSpeed = 50.0f * deltaTime;
+
+    yaw -= deltaMouseX * mouseSpeed;
+    pitch -= deltaMouseY * mouseSpeed;
+
+    lastMouseX = xpos;
+    lastMouseY = ypos;
+}
+
+
 void processInputs(GLFWwindow *window) {
+    glm::vec3(0.0f, 0.0f, 0.0f);
+
+    float cameraSpeed = 10.0f * deltaTime;
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        cameraPos += cameraFaceDirection * cameraSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        cameraPos -= cameraFaceDirection * cameraSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        cameraPos -= glm::normalize(glm::cross(cameraFaceDirection, cameraUp)) * cameraSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        cameraPos += glm::normalize(glm::cross(cameraFaceDirection, cameraUp)) * cameraSpeed;
     }
 }
 
@@ -62,47 +144,71 @@ int main() {
         return EXIT_FAILURE;
     }
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouse_callback);
 
     Shader shader("./src/shaders/vertex.glsl", "./src/shaders/fragment.glsl");
 
     VAO vao;
     vao.setVertices(vertices, sizeof(vertices));
     vao.setIndices(indices, sizeof(indices));
-    vao.enablePointer(0, 3, 8, 0);
-    vao.enablePointer(1, 3, 8, 3);
-    vao.enablePointer(2, 2, 8, 6);
+    vao.enablePointer(0, 3, 5, 0);
+    vao.enablePointer(1, 2, 5, 3);
     
     
     Texture containerTexture("./assets/container.jpeg", GL_RGB);
     Texture awesomefaceTexture("./assets/awesomeface.png", GL_RGBA);
 
+    glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f,  0.0f,  0.0f), 
+        glm::vec3( 2.0f,  5.0f, -15.0f), 
+        glm::vec3(-1.5f, -2.2f, -2.5f),  
+        glm::vec3(-3.8f, -2.0f, -12.3f),  
+        glm::vec3( 2.4f, -0.4f, -3.5f),  
+        glm::vec3(-1.7f,  3.0f, -7.5f),  
+        glm::vec3( 1.3f, -2.0f, -2.5f),  
+        glm::vec3( 1.5f,  2.0f, -2.5f), 
+        glm::vec3( 1.5f,  0.2f, -1.5f), 
+        glm::vec3(-1.3f,  1.0f, -1.5f)  
+    };
+
+
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
+    glm::mat4 view;
+
     while(!glfwWindowShouldClose(window)) {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         glfwPollEvents();
         processInputs(window);
 
+        glEnable(GL_DEPTH_TEST);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, -0.5f, 0));
-        model = glm::rotate(model, glm::radians((float)glfwGetTime() * 50), glm::vec3(0.0f, 0.0f, 1.0f));
-        shader.setUniformMatrix4fv("uMVP", model);
+        cameraFaceDirection.x = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+        cameraFaceDirection.z = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+        cameraFaceDirection.y = glm::sin(glm::radians(pitch));
+        cameraFaceDirection = glm::normalize(cameraFaceDirection);
 
-        containerTexture.use(shader, "uTexture1", GL_TEXTURE0, 0);
-        awesomefaceTexture.use(shader, "uTexture2", GL_TEXTURE1, 1);
-        vao.draw(shader);
+        view = glm::lookAt(cameraPos, cameraPos + cameraFaceDirection, cameraUp);
 
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-0.5f, 0.5f, 0.0f));
-        model = glm::scale(model, glm::vec3(sin(glfwGetTime() * 10) / 2 + 0.5f, 1.0f, 0.0f));
-        shader.setUniformMatrix4fv("uMVP", model);
-
-        containerTexture.use(shader, "uTexture1", GL_TEXTURE0, 0);
-        awesomefaceTexture.use(shader, "uTexture2", GL_TEXTURE1, 1);
-        vao.draw(shader);
+        for (int i = 0; i < 10; i++) {
+            containerTexture.use(shader, "uTexture1", GL_TEXTURE0, 0);
+            awesomefaceTexture.use(shader, "uTexture2", GL_TEXTURE1, 1);
+            glm::vec3 position = cubePositions[i];
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, position);
+            model = glm::rotate(model, glm::radians((float)glfwGetTime() * 45.0f) , glm::vec3(1.0f, 0.0f, 1.0f));
+            shader.setUniformMatrix4fv("uMVP", projection * view * model);
+            vao.drawArrays(shader);
+        }
 
         glfwSwapBuffers(window);
     }
-
+    
     glfwDestroyWindow(window);
     glfwTerminate();
     return EXIT_SUCCESS;

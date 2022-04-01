@@ -64,25 +64,37 @@ unsigned int indices[] = {
     0, 2, 3
 };
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, -20.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, -10.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 cameraFaceDirection;
 
 
-float yaw = 0.0f;
+float yaw = 90.0f;
 float pitch = 0.0f;
 
+
+bool firstMouse = true;
 float lastMouseX = 0.0f;
 float lastMouseY = 0.0f;
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+    if (firstMouse) {
+        lastMouseX = xpos;
+        lastMouseY = ypos;
+        firstMouse = false;
+    }
     float deltaMouseX = xpos - lastMouseX;
     float deltaMouseY = ypos - lastMouseY;
 
-    float mouseSpeed = 50.0f * deltaTime;
+    float mouseSpeed = 0.5f;
 
-    yaw -= deltaMouseX * mouseSpeed;
+    yaw += deltaMouseX * mouseSpeed;
     pitch -= deltaMouseY * mouseSpeed;
+
+    if(pitch > 89.0f)
+        pitch = 89.0f;
+    if(pitch < -89.0f)
+        pitch = -89.0f;
 
     lastMouseX = xpos;
     lastMouseY = ypos;
@@ -188,8 +200,8 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-        cameraFaceDirection.x = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
-        cameraFaceDirection.z = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+        cameraFaceDirection.x = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+        cameraFaceDirection.z = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
         cameraFaceDirection.y = glm::sin(glm::radians(pitch));
         cameraFaceDirection = glm::normalize(cameraFaceDirection);
 
@@ -201,7 +213,7 @@ int main() {
             glm::vec3 position = cubePositions[i];
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, position);
-            model = glm::rotate(model, glm::radians((float)glfwGetTime() * 45.0f) , glm::vec3(1.0f, 0.0f, 1.0f));
+            model = glm::rotate(model, glm::radians(0.0f) , glm::vec3(1.0f, 0.0f, 1.0f));
             shader.setUniformMatrix4fv("uMVP", projection * view * model);
             vao.drawArrays(shader);
         }
